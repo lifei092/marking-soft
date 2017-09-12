@@ -46,7 +46,7 @@
 #define GRAY_SIZE 309248                           //640*480+2048=
 #define RESULT_SIZE 309248                           //640*480+2048=
 
-#define CAMERA_SIZE    2048
+#define CAMERA_SIZE    128
 
 #define IMAMGE_PROCESS_SIZE    2048
 

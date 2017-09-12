@@ -55,6 +55,8 @@ int main()
 		return 0;
 	}
 
+	para_load();
+
 	//pthread setting
 	pthread_t tids[4]; //Ïß³Ìid
 	pthread_attr_t  attr;

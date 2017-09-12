@@ -79,6 +79,16 @@ void RAWCovert(unsigned char *p_buffer)
 	}
 }
 
+void ImageParamSet()
+{
+
+}
+
+void ImageParamChange()
+{
+
+}
+
 void image_capture()                      //相机获取图像
 {
 	Image rawImage;
@@ -197,7 +207,7 @@ void image_capture()                      //相机获取图像
 				uint32_t timergb = (time_rgb_get.tv_usec-time_raw12.tv_usec)+1000000*(time_rgb_get.tv_sec-time_raw12.tv_sec);
 				discri_front.time_raw12_to_rgb = timergb;
 				/********get the blue data ******************/
-				memcpy(p_discri+256, p_process_buffer, 256);
+				memcpy(p_discri+256, p_image_buffer, 256);
 
 
 

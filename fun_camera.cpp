@@ -87,7 +87,7 @@ void BrightnessSet()
 	Property prop;
 	prop.type = BRIGHTNESS;
 	prop.absControl = true;
-	prop.absValue = para_new.cam_brightness;
+	prop.absValue = cam_para_new.cam_brightness;
 	error = cam.SetProperty(&prop);
 	if (error != PGRERROR_OK)
 	{
@@ -102,7 +102,7 @@ void ExposureSet()
 	prop.onOff = true;
 	prop.autoManualMode = false;
 	prop.absControl = true;
-	prop.absValue = (para_new.cam_exposure)*0.001;//4,5
+	prop.absValue = (cam_para_new.cam_exposure)*0.001;//4,5
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -118,7 +118,7 @@ void SharpnessSet()
 	prop.autoManualMode = false;
 	prop.onePush = false;
 	prop.absControl = false;
-	prop.valueA = para_new.cam_sharpness;//8,9
+	prop.valueA = cam_para_new.cam_sharpness;//8,9
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -134,7 +134,7 @@ void HueSet()
 	prop.autoManualMode = false;
 	prop.onePush = false;
 	prop.absControl = false;
-	prop.absValue = para_new.cam_hue;//6,7
+	prop.absValue = cam_para_new.cam_hue;//6,7
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -149,7 +149,7 @@ void SaturationSet()
 	prop.onOff = true;
 	prop.autoManualMode = false;
 	prop.absControl = true;
-	prop.absValue = para_new.cam_saturation;//10,11
+	prop.absValue = cam_para_new.cam_saturation;//10,11
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -164,7 +164,7 @@ void GammaSet()
 	prop.onOff = true;
 	prop.autoManualMode = false;
 	prop.absControl = true;
-	prop.absValue = para_new.cam_gamma;
+	prop.absValue = cam_para_new.cam_gamma;
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -179,7 +179,7 @@ void ShutterSet()
 	prop.onOff = true;
 	prop.autoManualMode = false;
 	prop.absControl = true;
-	prop.absValue = (para_new.cam_shutter)*0.001;
+	prop.absValue = (cam_para_new.cam_shutter)*0.001;
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -193,7 +193,7 @@ void GainSet()
 	prop.type = GAIN;
 	prop.autoManualMode = false;
 	prop.absControl = true;
-	prop.absValue = (para_new.cam_gain)*0.001;//12,13
+	prop.absValue = (cam_para_new.cam_gain)*0.001;//12,13
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -205,17 +205,17 @@ void WhiteBalanceSet()
 {
 	Property prop;
 	prop.type = WHITE_BALANCE;
-	if(((para_new.cam_wb_red) & 0x8000) == 0x8000)
+	if(((cam_para_new.cam_wb_red) & 0x8000) == 0x8000)
 		prop.onOff = true;
 	else
 		prop.onOff = false;
-	if(((para_new.cam_wb_red) & 0x4000) == 0x4000)
+	if(((cam_para_new.cam_wb_red) & 0x4000) == 0x4000)
 		prop.autoManualMode = true;
 	else
 		prop.autoManualMode = false;
 	prop.absControl = false;
-	prop.valueA = para_new.cam_wb_red & 0x3ff;
-	prop.valueB = para_new.cam_wb_blue & 0x3ff;
+	prop.valueA = cam_para_new.cam_wb_red & 0x3ff;
+	prop.valueB = cam_para_new.cam_wb_blue & 0x3ff;
 	error = cam.SetProperty(&prop);
 	if(error != PGRERROR_OK)
 	{
@@ -277,10 +277,10 @@ int GetROISet()					//th‘ˆº”∑µªÿ≈–∂œ
 	}
 
 	GigEImageSettings imageSettings;
-	imageSettings.offsetX = para_new.cam_roi_w_offset;//20,21
-	imageSettings.offsetY = para_new.cam_roi_h_offset; //24,25
-	imageSettings.height = para_new.cam_roi_h;//22,23
-	imageSettings.width = para_new.cam_roi_w;//18,19
+	imageSettings.offsetX = cam_para_new.cam_roi_w_offset;//20,21
+	imageSettings.offsetY = cam_para_new.cam_roi_h_offset; //24,25
+	imageSettings.height = cam_para_new.cam_roi_h;//22,23
+	imageSettings.width = cam_para_new.cam_roi_w;//18,19
 	imageSettings.pixelFormat = PIXEL_FORMAT_RAW12;
 
 	error = cam.SetGigEImageSettings(&imageSettings);
@@ -597,8 +597,8 @@ int camera_connect()
 void GetROISet0()
 {
 	GigEImageSettings imageSettings;
-	imageSettings.offsetX = para_new.cam_roi_w_offset;
-	imageSettings.offsetY = para_new.cam_roi_h_offset;
+	imageSettings.offsetX = cam_para_new.cam_roi_w_offset;
+	imageSettings.offsetY = cam_para_new.cam_roi_h_offset;
 
 	error = cam.SetGigEImageSettings(&imageSettings);
 	if(error != PGRERROR_OK)
@@ -608,10 +608,11 @@ void GetROISet0()
 	}
 }
 
-void ParaSet()
+
+void CameraParamSet()
 {
-	memcpy(&para_new,(p_camera_buffer+1024),sizeof(para_new));
-	memcpy(&para_old,(p_camera_buffer+1024),sizeof(para_old));
+	memcpy(&cam_para_new, p_camera_buffer, sizeof(cam_para_new));
+	memcpy(&cam_para_old, p_camera_buffer, sizeof(cam_para_old));
 	BrightnessSet();
 	ShutterSet();
 	GammaSet();
@@ -624,38 +625,38 @@ void ParaSet()
 	GetROISet();
 }
 
-void ParaChange()
+void CameraParamChange()
 {
-	memcpy(&para_new,p_camera_buffer,sizeof(para_new));
+	memcpy(&cam_para_new, p_camera_buffer, sizeof(cam_para_new));
 
-	if(para_new.cam_brightness != para_old.cam_brightness)
+	if(cam_para_new.cam_brightness != cam_para_old.cam_brightness)
 		BrightnessSet();
 
-	if(para_new.cam_shutter != para_old.cam_shutter)
+	if(cam_para_new.cam_shutter != cam_para_old.cam_shutter)
 		ShutterSet();
 
-	if(para_new.cam_gamma != para_old.cam_gamma)
+	if(cam_para_new.cam_gamma != cam_para_old.cam_gamma)
 		GammaSet();
 
-	if(para_new.cam_exposure != para_old.cam_exposure)
+	if(cam_para_new.cam_exposure != cam_para_old.cam_exposure)
 		ExposureSet();
 
-	if(para_new.cam_hue != para_old.cam_hue)
+	if(cam_para_new.cam_hue != cam_para_old.cam_hue)
 		HueSet();
 
-	if(para_new.cam_sharpness != para_old.cam_sharpness)
+	if(cam_para_new.cam_sharpness != cam_para_old.cam_sharpness)
 		SharpnessSet();
 
-	if(para_new.cam_saturation != para_old.cam_saturation)
+	if(cam_para_new.cam_saturation != cam_para_old.cam_saturation)
 		SaturationSet();
 
-	if(para_new.cam_gain != para_old.cam_gain)
+	if(cam_para_new.cam_gain != cam_para_old.cam_gain)
 		GainSet();
 
-	if(para_new.cam_wb_red != para_old.cam_wb_red)
+	if(cam_para_new.cam_wb_red != cam_para_old.cam_wb_red)
 		WhiteBalanceSet();
 
-	if((para_new.cam_roi_h_offset) != (para_old.cam_roi_h_offset))
+	if((cam_para_new.cam_roi_h_offset) != (cam_para_old.cam_roi_h_offset))
 	{
 		error = cam.StopCapture();
 		if (error != PGRERROR_OK)

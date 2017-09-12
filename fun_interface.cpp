@@ -32,9 +32,9 @@ void *file_write(unsigned char *buff_write, uint32_t length_c)// 程序更新
 }
 
 //读取当前参数文件到缓存区
-//参数文件不为零且当前参数文件内参数组的CRC计算均正确后一次性读入参数缓存区p_para_info
+//参数文件不为零且当前参数文件内参数组的CRC计算均正确后一次性读入参数缓存区p_param_info
 //将当前相机参数读入缓存区 p_camera_buffer
-//将当前处理参数读入缓存区 p_process_buffer
+//将当前处理参数读入缓存区 p_image_buffer
 void *para_load()
 {
 	FILE *stream;   //file of sending
@@ -67,8 +67,12 @@ void *para_load()
                 uint32_t count_temp = g_current_count*sizeof(current_item)+sizeof(filemiaoshu);
                 memcpy(p_camera_buffer, p_param_info+count_temp, 128);
                 count_temp = count_temp+128;
-                memcpy(p_process_buffer, p_param_info+count_temp, 256);
+                memcpy(p_image_buffer, p_param_info+count_temp, 256);
                 count_temp = count_temp+256;
+                CameraParamSet();
+                ImageParamSet();
+                g_flag_camera_init = true;
+                g_flag_image_init = true;
             }
         }
     }
@@ -76,7 +80,7 @@ void *para_load()
 }
 
 //保存当前参数到参数文件
-//保存完毕后重新读取当前参数文件到内存
+//保存完毕后更新当前参数文件到内存
 void *para_write1()
 {
 	uint32_t crc_miaoshu = crc_c32(p_param_info, 256);
@@ -107,7 +111,18 @@ void *para_write1()
 					fsync(fileno(stream));
 					fclose(stream);
 					printf("MSG: Central_para file write ok!  In para_white1() function.\n");
-					para_load();
+					//para_load();
+					struct ExtIPCParaItem current_item;
+					g_current_count = filemiaoshu.ext_prog_no;
+                    uint32_t count_temp = g_current_count*sizeof(current_item)+sizeof(filemiaoshu);
+                    memcpy(p_camera_buffer, p_param_info+count_temp, 128);
+                    count_temp = count_temp+128;
+                    memcpy(p_image_buffer, p_param_info+count_temp, 256);
+                    count_temp = count_temp+256;
+                    CameraParamChange();
+                    ImageParamChange();
+                    g_flag_camera_init = true;
+                    g_flag_image_init = true;
 				}
             }
         }
@@ -116,7 +131,7 @@ void *para_write1()
 }
 
 //更换当前程序号，重新生成参数文件的描述，并写入当前参数文件
-//写完参数文件后要重新下载当前参数文件
+//写完参数文件后要更新当前参数文件
 void *para_write()
 {
 	int write_flag_counter;
@@ -143,7 +158,18 @@ void *para_write()
 			fsync(fileno(stream_counter));
 			fclose(stream_counter);
 			printf("MSG: Central_para file write ok! In para_white() function.\n");
-			para_load();
+			//para_load();
+			struct ExtIPCParaItem current_item;
+            g_current_count = filemiaoshu.ext_prog_no;
+            uint32_t count_temp = g_current_count*sizeof(current_item)+sizeof(filemiaoshu);
+            memcpy(p_camera_buffer, p_param_info+count_temp, 128);
+            count_temp = count_temp+128;
+            memcpy(p_image_buffer, p_param_info+count_temp, 256);
+            count_temp = count_temp+256;
+            CameraParamChange();
+            ImageParamChange();
+            g_flag_camera_init = true;
+            g_flag_image_init = true;
 		}
     }
     return NULL;
@@ -440,7 +466,7 @@ void tcp_interface()
 					}
 					else if(cmd_temp == 0x4)			//send orignal image
 					{
-						if(g_flag_camera_init & g_flag_process_init & (g_buf_num<0x20))
+						if(g_flag_camera_init & g_flag_image_init & (g_buf_num<0x20))
 						{
 							number_send = g_buf_num;
 							flag_state = p_orignal[number_send];
@@ -489,7 +515,7 @@ void tcp_interface()
 					}
 					else if(cmd_temp == 0x5)									//send rgb image
 					{
-						if(g_flag_camera_init & g_flag_process_init & (g_buf_num<0x20))
+						if(g_flag_camera_init & g_flag_image_init & (g_buf_num<0x20))
 						{
 							number_send = g_buf_num;
 							flag_state = p_rgb[number_send];
@@ -551,13 +577,20 @@ void tcp_interface()
 						if(crc32 == head_tcp.data_crc)
 						{
 							memcpy(&camera_old, p_camera_buffer, sizeof(camera_old));
-							//while(g_flag_param_set == 0xf2)
-							//	printf("wait!\n");
-							memcpy(p_camera_buffer, p_buff_tcp+size_packhead, sizeof(camera_new));
-							memcpy(&camera_new, p_camera_buffer, sizeof(camera_new));
-							//ParaChange();
-							if((camera_new.tran12_8_gamma!=camera_old.tran12_8_gamma)|(camera_new.tran12_8_l_limit!=camera_old.tran12_8_l_limit)|(camera_new.tran12_8_h_limit!= camera_old.tran12_8_h_limit))
-								init_lut(camera_new.tran12_8_gamma,camera_new.tran12_8_l_limit,camera_new.tran12_8_h_limit);
+                            memcpy(p_camera_buffer, p_buff_tcp+size_packhead, sizeof(camera_new));
+                            memcpy(&camera_new, p_camera_buffer, sizeof(camera_new));
+							if(g_flag_camera_init == false)
+							{
+                                CameraParamSet();
+								init_lut(camera_new1.tran12_8_gamma, camera_new1.tran12_8_l_limit, camera_new1.tran12_8_h_limit);
+							}
+							else
+							{
+                                CameraParamChange();
+                                if((camera_new.tran12_8_gamma!=camera_old.tran12_8_gamma)|(camera_new.tran12_8_l_limit!=camera_old.tran12_8_l_limit)|(camera_new.tran12_8_h_limit!= camera_old.tran12_8_h_limit))
+                                    init_lut(camera_new.tran12_8_gamma,camera_new.tran12_8_l_limit,camera_new.tran12_8_h_limit);
+							}
+							g_flag_camera_init == true;
 							state_ok(p_send, cmd_temp);
 							send_num = send(temp_sock_descriptor, p_send, size_packhead,0);
 							if(send_num < 0)
@@ -571,7 +604,7 @@ void tcp_interface()
 								printf("send_error!\n");
 						}
 					}
-	            	else if(cmd_temp == 0x21) //商标检测预处理参数组设置
+	            	else if(cmd_temp == 0x21) //图像处理参数组设置
 					{
 						memcpy(&head_tcp, p_buff_tcp, size_packhead);
 						count_process = 0;
@@ -585,12 +618,18 @@ void tcp_interface()
 						crc32 = crc_c32(p_buff_tcp+size_packhead,head_tcp.data_sum);
 						if(crc32 == head_tcp.data_crc)
 						{
-							memcpy(&para_temp_old, p_process_buffer, sizeof(para_temp_old));
-							//while(g_flag_param_set == 0xf3)
-							//	printf("wait!\n");
-							memcpy(p_process_buffer, p_buff_tcp+size_packhead, sizeof(para_temp_old));
-							memcpy(&para_temp_new, p_process_buffer, sizeof(para_temp_new));
-							//table_change(para_temp_old, para_temp_new);
+							memcpy(&para_temp_old, p_image_buffer, sizeof(para_temp_old));
+							memcpy(p_image_buffer, p_buff_tcp+size_packhead, sizeof(para_temp_old));
+							memcpy(&para_temp_new, p_image_buffer, sizeof(para_temp_new));
+							if(g_flag_image_init == false)
+                            {
+                                ImageParamSet();
+                            }
+                            else
+                            {
+                                ImageParamChange();
+                            }
+                            g_flag_image_init = true;
 							state_ok(p_send, cmd_temp);
 							send_num = send(temp_sock_descriptor,p_send,size_packhead,0);
 							if(send_num < 0)
@@ -632,7 +671,7 @@ void tcp_interface()
 								printf("send_error!\n");
 						}
 					}
-					else if(cmd_temp == 0x25)											//中心存储的参数文件设置
+					else if(cmd_temp == 0x25)											//参数文件保存设置
 					{
 						count_process = 0;
 						memcpy(&head_tcp, p_buff_tcp, size_packhead);

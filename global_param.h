@@ -30,8 +30,8 @@ unsigned char *p_iw8;						//iw8 data buffer
 unsigned char *p_rgb_0;						//iw12-iw8 mid buffer
 unsigned char *p_data8;
 
-unsigned char *p_camera_buffer;		     		//相机参数缓存区----2k
-unsigned char *p_process_buffer;				//处理参数缓存
+unsigned char *p_camera_buffer;		     		//相机参数缓存区----128B
+unsigned char *p_image_buffer;			    	//处理参数缓存
 unsigned char *p_refer_image;				//参考图像缓存区iw12--640*480*1.5=460800bytes + 2048 = 462848
 unsigned char *p_quick_image;				//快照图缓存区 iw12---640*480*1.5=460800bytes + 2048 = 462848
 
@@ -53,10 +53,10 @@ uint8_t		   g_refer_para;								//更新当前中心参数文件标识,自增一，取低五位
 uint8_t		   g_buf_num;				    //当前buffer编号  number=numer_ori & 0x1f
 uint8_t		   g_buf_cur_num;				//当前触发编号
 uint8_t		   g_work_mode;					//工作模式  save the orignal image data from camera、refer image or quick image
-uint8_t		   g_buf_num_serial;							//每次中心处理完毕后此标识=g_buf_num，串口部分检测到此标识的变化则发送当前判定结果
+uint8_t		   g_buf_num_serial;			//每次中心处理完毕后此标识=g_buf_num，串口部分检测到此标识的变化则发送当前判定结果
 
 bool		   g_flag_camera_init;			//相机初始化标识
-bool		   g_flag_process_init;			//图像处理参数初始化标识
+bool		   g_flag_image_init;			//图像处理参数初始化标识
 
 uint8_t		   g_current_count;				//当前程序号
 
@@ -121,7 +121,7 @@ struct Discriptor2K_Label
 /* 本图像使用的相机参数128bytes*/
     uint8_t  camera_buffer[128];
 /*本图像使用的处理参数256bytes*/
-    uint8_t  prepro_buffer[256];
+    uint8_t  process_buffer[256];
 /*本图像处理结果 256 bytes*/
     uint8_t  result_buffer[256];
 
@@ -251,7 +251,7 @@ struct ExtParaGroupGeneralInfo
     uint32_t para_crc;											//参数组crc，不包括本结构体;
     uint64_t hardwareMAC;										//CIPCx硬件eth0 MAC地址;//暂不使用
     uint64_t softwareID;										//应用软件的id,应用软件会比较自身id和该softwareID;//暂不使用
-    uint8_t  ext_prog_no;										//当前使用的瓶型序号;
+    uint8_t  ext_prog_no;										//当前使用的瓶型序号;即程序号
     uint8_t  ext_style;											//0:瓶盖检测,其它未定;
     uint8_t  rsv[226];
     uint32_t crc;												//本一般性描述结构体crc;
@@ -261,7 +261,7 @@ struct ExtParaGroupGeneralInfo filemiaoshu;
 
 struct Discriptor2K_Label discri_front;		//当前附加数据结构
 struct timeval time_serial_recv;			//串口接收时间戳
-struct ExtCamPara para_old;                 //相机参数old
-struct ExtCamPara para_new;                 //相机参数new
+struct ExtCamPara cam_para_old;                 //相机参数old
+struct ExtCamPara cam_para_new;                 //相机参数new
 
 #endif // GLOBAL_PARAM_H_INCLUDED

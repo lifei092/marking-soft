@@ -164,7 +164,7 @@ void recive_serial()//recive the serial data
 
 	while(1)
 	{
-		if(g_flag_camera_init)
+		if(g_flag_camera_init & g_flag_image_init)
 		{
 			if(begin_flag == false)
 			{

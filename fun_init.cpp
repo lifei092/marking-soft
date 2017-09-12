@@ -58,8 +58,8 @@ bool buffer_define()
     memset(p_camera_buffer, 0, CAMERA_SIZE);                        //2kbytes
     len_tmp = len_tmp+CAMERA_SIZE;
 
-    p_process_buffer = g_pmmap_buf+len_tmp;
-    memset(p_process_buffer, 0, IMAMGE_PROCESS_SIZE);                        //2kbytes
+    p_image_buffer = g_pmmap_buf+len_tmp;
+    memset(p_image_buffer, 0, IMAMGE_PROCESS_SIZE);                        //2kbytes
     len_tmp = len_tmp+IMAMGE_PROCESS_SIZE;
 
     p_refer_image = g_pmmap_buf+len_tmp;
@@ -104,7 +104,7 @@ bool buffer_define()
     g_work_mode = 0xff;
 
     g_flag_camera_init = false;
-    g_flag_process_init = false;
+    g_flag_image_init = false;
     g_refer_image = 0xff;
     g_refer_para = 0xff;
     memset(&discri_front, 0, sizeof(discri_front));
