@@ -43,7 +43,7 @@
 #define ORIGNAL_SIZE   462848                         //640*480*1.5+2048
 #define ORIG_DATA_SIZE 460800                           //640*480*1.5
 
-#define GRAY_SIZE 309248                           //640*480+2048
+#define GRAY_SIZE 309248                           //640*480+2048=
 #define RESULT_SIZE 309248                           //640*480+2048
 
 #define CAMERA_SIZE    2048
