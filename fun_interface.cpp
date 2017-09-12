@@ -1,6 +1,7 @@
 #include "global_head.h"
 #include "global_param.h"
 #include "fun_public.h"
+#include "fun_camera.h"
 #include "fun_interface.h"
 
 void *file_write(unsigned char *buff_write, uint32_t length_c)// ³ÌÐò¸üÐÂ
@@ -582,7 +583,7 @@ void tcp_interface()
 							if(g_flag_camera_init == false)
 							{
                                 CameraParamSet();
-								init_lut(camera_new1.tran12_8_gamma, camera_new1.tran12_8_l_limit, camera_new1.tran12_8_h_limit);
+								init_lut(camera_new.tran12_8_gamma, camera_new.tran12_8_l_limit, camera_new.tran12_8_h_limit);
 							}
 							else
 							{

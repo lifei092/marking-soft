@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1505129229 source:/Program/marking-soft/fun_camera.cpp
+1505206006 source:/Program/marking-soft/fun_camera.cpp
 	"global_head.h"
 	"global_param.h"
 	"fun_public.h"
 	"fun_camera.h"
 
-1505129835 /Program/marking-soft/global_head.h
+1505206006 /Program/marking-soft/global_head.h
 	"stdio.h"
 	"sys/types.h"
 	"sys/socket.h"
@@ -309,20 +309,20 @@
 	"FlyCapture2Platform.h"
 	"FlyCapture2Defs.h"
 
-1505182183 /Program/marking-soft/global_param.h
+1505206006 /Program/marking-soft/global_param.h
 	"global_head.h"
 
 1505181064 /Program/marking-soft/fun_public.h
 	"global_head.h"
 
-1505124427 /Program/marking-soft/fun_camera.h
+1505206311 /Program/marking-soft/fun_camera.h
 
-1505129367 source:/Program/marking-soft/fun_init.cpp
+1505206006 source:/Program/marking-soft/fun_init.cpp
 	"global_head.h"
 	"global_param.h"
 	"fun_init.h"
 
-1505124165 /Program/marking-soft/fun_init.h
+1505196980 /Program/marking-soft/fun_init.h
 
 1424883215 ../../../../../usr/include/math.h
 	<features.h>
@@ -338,15 +338,16 @@
 	<bits/mathinline.h>
 	<bits/math-finite.h>
 
-1505130130 source:/Program/marking-soft/fun_interface.cpp
+1505206335 source:/Program/marking-soft/fun_interface.cpp
 	"global_head.h"
 	"global_param.h"
 	"fun_public.h"
+	"fun_camera.h"
 	"fun_interface.h"
 
-1505124444 /Program/marking-soft/fun_interface.h
+1505206361 /Program/marking-soft/fun_interface.h
 
-1505182207 source:/Program/marking-soft/fun_picture.cpp
+1505206006 source:/Program/marking-soft/fun_picture.cpp
 	"global_head.h"
 	"global_param.h"
 	"fun_public.h"
@@ -648,7 +649,7 @@
 	"global_param.h"
 	"fun_public.h"
 
-1505182024 source:/Program/marking-soft/fun_serial.cpp
+1505206006 source:/Program/marking-soft/fun_serial.cpp
 	"global_head.h"
 	"global_param.h"
 	"fun_public.h"

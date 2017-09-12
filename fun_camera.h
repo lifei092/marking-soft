@@ -4,8 +4,12 @@
 
 int camera_connect();
 
-void ParaSet();
+void CameraParamSet();
 
-void ParaChange();
+void CameraParamChange();
+
+void ImageParamSet();
+
+void ImageParamChange();
 
 #endif  //FUN_CAMERA_H_INCLUDED
