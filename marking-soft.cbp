@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="marking-soft" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/marking-soft" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/marking-soft" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="../../usr/include" />
+			<Add directory="../../usr/include/flycapture" />
+		</Compiler>
+		<ResourceCompiler>
+			<Add directory="../../usr/include" />
+			<Add directory="../../usr/include/flycapture" />
+		</ResourceCompiler>
+		<Linker>
+			<Add library="../../../usr/lib/libflycapture.so.2" />
+			<Add library="../../../lib/x86_64-linux-gnu/libpthread-2.19.so" />
+			<Add directory="../../usr/include" />
+			<Add directory="../../usr/include/flycapture" />
+		</Linker>
+		<Unit filename="fun_camera.cpp" />
+		<Unit filename="fun_init.cpp" />
+		<Unit filename="fun_init.h" />
+		<Unit filename="fun_interface.cpp" />
+		<Unit filename="fun_interface.h" />
+		<Unit filename="fun_picture.cpp" />
+		<Unit filename="fun_picture.h" />
+		<Unit filename="fun_public.cpp" />
+		<Unit filename="fun_public.h" />
+		<Unit filename="fun_serial.cpp" />
+		<Unit filename="fun_serial.h" />
+		<Unit filename="global_head.h" />
+		<Unit filename="global_param.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
