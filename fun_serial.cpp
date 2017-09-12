@@ -9,7 +9,7 @@ int set_speed(int fd, int speed)
 {
 	int   i;
 	int   status;
-	struct termios  Opt;
+	struct termios Opt;
 	tcgetattr(fd, &Opt);
 	int speed_arr[2] = {B115200, B38400};
 	int name_arr[2] = {115200, 38400};

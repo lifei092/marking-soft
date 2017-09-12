@@ -82,7 +82,7 @@ void *para_load()
 
 //保存当前参数到参数文件
 //保存完毕后更新当前参数文件到内存
-void *para_write1()
+void *para_write()
 {
 	uint32_t crc_miaoshu = crc_c32(p_param_info, 256);
     if(crc_miaoshu == 0)
@@ -133,7 +133,7 @@ void *para_write1()
 
 //更换当前程序号，重新生成参数文件的描述，并写入当前参数文件
 //写完参数文件后要更新当前参数文件
-void *para_write()
+void *para_write_process_num_change()
 {
 	int write_flag_counter;
     FILE *stream_counter;   //file of sending
@@ -276,6 +276,30 @@ void *state_0x20_rgb(unsigned char *p_send0, uint16_t cmd0, uint8_t number_send0
 	return NULL;
 }
 
+void *state_0x20_gray(unsigned char *p_send0, uint16_t cmd0, uint8_t number_send0) //send current gray image data
+{
+	struct Packhead cmd_e;
+	int size_cmd_e = sizeof(cmd_e);
+	memset(&cmd_e, 0, size_cmd_e);
+	cmd_e.cmd = cmd0;
+	cmd_e.data_sum = GRAY_SIZE;
+	cmd_e.crc = crc_c((unsigned char *)&cmd_e, size_cmd_e-1);
+	memcpy(p_send0, &cmd_e, size_cmd_e);
+	return NULL;
+}
+
+void *state_0x20_result(unsigned char *p_send0, uint16_t cmd0, uint8_t number_send0) //send current result image data
+{
+	struct Packhead cmd_e;
+	int size_cmd_e = sizeof(cmd_e);
+	memset(&cmd_e, 0, size_cmd_e);
+	cmd_e.cmd = cmd0;
+	cmd_e.data_sum = RESULT_SIZE;
+	cmd_e.crc = crc_c((unsigned char *)&cmd_e, size_cmd_e-1);
+	memcpy(p_send0, &cmd_e, size_cmd_e);
+	return NULL;
+}
+
 void *state_0x30(unsigned char *p_send0, uint16_t cmd0)  //no new image
 {
 	struct Packhead cmd_e;
@@ -284,18 +308,6 @@ void *state_0x30(unsigned char *p_send0, uint16_t cmd0)  //no new image
 	cmd_e.cmd = cmd0;
 	cmd_e.echo_flag = 1;
 	cmd_e.crc = crc_c((unsigned char *)&cmd_e, size_cmd_e-1);
-	memcpy(p_send0, &cmd_e, size_cmd_e);
-	return NULL;
-}
-
-void *state_0x300(unsigned char *p_send0, uint16_t cmd0)   //no new image
-{
-	struct Packhead cmd_e;
-	int size_cmd_e = sizeof(cmd_e);
-	memset(&cmd_e, 0, size_cmd_e);
-	cmd_e.cmd = cmd0;
-	cmd_e.echo_flag = 5;
-	cmd_e.crc = crc_c((unsigned char *)&cmd_e,size_cmd_e-1);
 	memcpy(p_send0, &cmd_e, size_cmd_e);
 	return NULL;
 }
@@ -489,12 +501,9 @@ void tcp_interface()
 								send_num_stop = 0;
 								while(send_num < ORIGNAL_SIZE)
 								{
-									//if(g_flag_blue_img == false)
-									{
-										send_num_stop = send(temp_sock_descriptor, flag_state+send_num, ORIGNAL_SIZE-send_num, 0);
-										if(send_num_stop > 0)
-											send_num = send_num+send_num_stop;
-									}
+                                    send_num_stop = send(temp_sock_descriptor, flag_state+send_num, ORIGNAL_SIZE-send_num, 0);
+                                    if(send_num_stop > 0)
+                                        send_num = send_num+send_num_stop;
 								}
 								flag_state[ORIGNAL_SIZE] = 0x30;
 							}
@@ -538,12 +547,9 @@ void tcp_interface()
 								send_num_stop = 0;
 								while(send_num < RGB_SIZE)
 								{
-									//if(g_flag_blue_img == false)
-									{
-										send_num_stop = send(temp_sock_descriptor, flag_state+send_num, RGB_SIZE-send_num, 0);
-										if(send_num_stop > 0)
-											send_num = send_num+send_num_stop;
-									}
+                                    send_num_stop = send(temp_sock_descriptor, flag_state+send_num, RGB_SIZE-send_num, 0);
+                                    if(send_num_stop > 0)
+                                        send_num = send_num+send_num_stop;
 								}
 								flag_state[RGB_SIZE] = 0x30;
 							}
@@ -563,6 +569,98 @@ void tcp_interface()
 								printf("send_error! 4\n");
 						}
 					}
+					else if(cmd_temp == 0x6)    //send gray image
+                    {
+                        if(g_flag_camera_init & g_flag_image_init & (g_buf_num<0x20))
+						{
+							number_send = g_buf_num;
+							flag_state = p_gray[number_send];
+							if(flag_state[GRAY_SIZE] == 0x10)
+							{
+								if(number_send != 0)
+									number_send = (number_send-1) & 0x1f;
+								else
+									number_send = 31;
+							}
+							flag_state = p_gray[number_send];
+							if(flag_state[GRAY_SIZE] == 0x20)
+							{
+								state_0x20_gray(p_send, cmd_temp, number_send);
+								send_num = send(temp_sock_descriptor, p_send, size_packhead, 0);
+								if(send_num < 0)
+									printf("send_error! 4\n");
+								send_num = 0;
+								send_num_stop = 0;
+								while(send_num < GRAY_SIZE)
+								{
+                                    send_num_stop = send(temp_sock_descriptor, flag_state+send_num, GRAY_SIZE-send_num, 0);
+                                    if(send_num_stop > 0)
+                                        send_num = send_num+send_num_stop;
+								}
+								flag_state[GRAY_SIZE] = 0x30;
+							}
+							else
+							{
+								state_0x30(p_send, cmd_temp);                     //no new image
+								send_num = send(temp_sock_descriptor, p_send, size_packhead, 0);
+								if(send_num < 0)
+									printf("send_error! 4\n");
+							}
+						}
+						else
+						{
+							state_0x30(p_send, cmd_temp);
+							send_num = send(temp_sock_descriptor, p_send, size_packhead, 0);
+							if(send_num < 0)
+								printf("send_error! 4\n");
+						}
+                    }
+                    else if(cmd_temp == 0x7)   //send result image
+                    {
+                        if(g_flag_camera_init & g_flag_image_init & (g_buf_num<0x20))
+						{
+							number_send = g_buf_num;
+							flag_state = p_result[number_send];
+							if(flag_state[RESULT_SIZE] == 0x10)
+							{
+								if(number_send != 0)
+									number_send = (number_send-1) & 0x1f;
+								else
+									number_send = 31;
+							}
+							flag_state = p_result[number_send];
+							if(flag_state[RESULT_SIZE] == 0x20)
+							{
+								state_0x20_gray(p_send, cmd_temp, number_send);
+								send_num = send(temp_sock_descriptor, p_send, size_packhead, 0);
+								if(send_num < 0)
+									printf("send_error! 4\n");
+								send_num = 0;
+								send_num_stop = 0;
+								while(send_num < RESULT_SIZE)
+								{
+                                    send_num_stop = send(temp_sock_descriptor, flag_state+send_num, RESULT_SIZE-send_num, 0);
+                                    if(send_num_stop > 0)
+                                        send_num = send_num+send_num_stop;
+								}
+								flag_state[RESULT_SIZE] = 0x30;
+							}
+							else
+							{
+								state_0x30(p_send, cmd_temp);                     //no new image
+								send_num = send(temp_sock_descriptor, p_send, size_packhead, 0);
+								if(send_num < 0)
+									printf("send_error! 4\n");
+							}
+						}
+						else
+						{
+							state_0x30(p_send, cmd_temp);
+							send_num = send(temp_sock_descriptor, p_send, size_packhead, 0);
+							if(send_num < 0)
+								printf("send_error! 4\n");
+						}
+                    }
 					else if(cmd_temp == 0x20)   //相机参数组设置
 					{
 						memcpy(&head_tcp, p_buff_tcp, size_packhead);
@@ -644,7 +742,11 @@ void tcp_interface()
 								printf("send_error!\n");
 						}
 					}
-					else if(cmd_temp==0x24)//商标检测快照图设置
+					else if(cmd_temp == 0x22) //返回20幅调试图像
+                    {
+
+                    }
+					else if(cmd_temp == 0x24)//快照图设置
 					{
 						memcpy(&head_tcp, p_buff_tcp, size_packhead);
 						count_process = 0;
@@ -697,9 +799,7 @@ void tcp_interface()
 							if((crc_1==0) & (crc_2==crc_3))
 							{
 								memcpy(p_param_info, p_buff_tcp+size_packhead, head_tcp.data_sum);
-								para_write1();
-								g_refer_para = (g_refer_para+1) & 0x1f;
-								g_refer_image = (g_refer_image+1) & 0x1f;
+								para_write();
 							}
 						}
 						else
@@ -718,9 +818,7 @@ void tcp_interface()
 						send_num = send(temp_sock_descriptor,p_send,size_packhead,0);
 						if(send_num < 0)
 							printf("send_error! 2\n");
-						para_write();
-						g_refer_para = (g_refer_para+1) & 0x1f;
-						g_refer_image = (g_refer_image+1) & 0x1f;
+						para_write_process_num_change();
 					}
 					else													 //cmd不认识
 					{

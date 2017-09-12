@@ -34,6 +34,8 @@
 #define ONLINE_SIZE         1024						//online data size 1024
 #define RGB_SIZE       923648                         //640*480*3+2048
 
+#define REFER_SIZE          462848						//640*480*1.5+2048
+
 #define TCP_BUFF_SIZE  8388608                          //8*1024*1024 8M
 #define TABLE_IW       1048576                         //1*1024*1024 1M
 
@@ -59,9 +61,9 @@
 #define H			   1280							  // 定义要转换图像行数
 #define W			   480							  // 定义要转换图像列数
 
-#define INTERFACE_IP   "192.168.1.40"                 //人机 ip
-#define PC_IP	       "192.168.1.30"				  //中心PC ip
-#define CAMERA_IP      "192.168.0.20"                 //camera ip
+#define INTERFACE_IP   "192.168.1.60"                 //人机 ip
+#define PC_IP	       "192.168.1.52"				  //中心PC ip
+#define CAMERA_IP      "192.168.0.15"                 //camera ip
 #define INTERFACE_PORT 8000							  //from interface
 
 #endif //GLOBAL_HEAD_H_INCLUDED

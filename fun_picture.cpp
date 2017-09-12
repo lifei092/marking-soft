@@ -4,14 +4,14 @@
 #include "fun_picture.h"
 
 
-#define W0 1280
+#define W0 640
 #define H0 480
 
-#define B(x,y) pRGB24[0 + 3 * ((x) + 1280 * (y))]
-#define G(x,y) pRGB24[1 + 3 * ((x) + 1280 * (y))]
-#define R(x,y) pRGB24[2 + 3 * ((x) + 1280 * (y))]
+#define B(x,y) pRGB24[0 + 3 * ((x) + 640 * (y))]
+#define G(x,y) pRGB24[1 + 3 * ((x) + 640 * (y))]
+#define R(x,y) pRGB24[2 + 3 * ((x) + 640 * (y))]
 
-#define Bay(x,y) p_iw8[(x) + 1280 * (y)]
+#define Bay(x,y) p_iw8[(x) + 640 * (y)]
 
 void bayer_zeros(unsigned char *pBay)
 {
@@ -67,7 +67,7 @@ void RAWCovert(unsigned char *p_buffer)
 	{
 		for (j=0; j<H0; j+=2)
 		{
-			if (i==0 || j==0 || i==1278 || j==478)
+			if (i==0 || j==0 || i==638 || j==478)
 			{
 				bayer_copy(p_iw8, p_buffer, i, j);
 			}
@@ -149,14 +149,6 @@ void image_capture()                      //相机获取图像
 					discri_front.wb_blue_now = (whitevalue & 0x00FFF000)>>12;
 					discri_front.wb_red_now  = (whitevalue & 0xFFF);
 				}
-				else if((temp_work_mode & 0xf0)==0x90)                     //save the orignal image data from refer image
-				{
-					rdata = p_refer_image+2048;
-					memcpy(&red_now, p_refer_image+4, 2);
-					memcpy(&blue_now, p_refer_image+6, 2);
-					discri_front.wb_blue_now = blue_now;
-					discri_front.wb_red_now  = red_now;
-				}
 				else if((temp_work_mode & 0xf0)==0xa0)                     //save the orignal image data from quick image
 				{
 					rdata = p_quick_image+2048;
@@ -191,13 +183,13 @@ void image_capture()                      //相机获取图像
 				}
 				RAWCovert(p_rgb_0);                             //iw8---rgb
 				int kk = 2048;
-				for(j=0; j<1280; j++)                       //save RGBdata to address
+				for(j=0; j<640; j++)                       //save RGBdata to address
 				{
 					for(i=0; i<480; i++)
 					{
-						p_rgb_temp[kk] = p_rgb_0[i*1280*3+j*3];
-						p_rgb_temp[kk+1] = p_rgb_0[i*1280*3+j*3+1];
-						p_rgb_temp[kk+2] = p_rgb_0[i*1280*3+j*3+2];
+						p_rgb_temp[kk] = p_rgb_0[i*640*3+j*3];
+						p_rgb_temp[kk+1] = p_rgb_0[i*640*3+j*3+1];
+						p_rgb_temp[kk+2] = p_rgb_0[i*640*3+j*3+2];
 						kk = kk+3;
 					}
 				}

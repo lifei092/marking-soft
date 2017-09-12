@@ -62,10 +62,6 @@ bool buffer_define()
     memset(p_image_buffer, 0, IMAMGE_PROCESS_SIZE);                        //2kbytes
     len_tmp = len_tmp+IMAMGE_PROCESS_SIZE;
 
-    p_refer_image = g_pmmap_buf+len_tmp;
-    memset(p_refer_image, 0, ORIGNAL_SIZE);                         //640*480*1.5+2048
-    len_tmp = len_tmp+ORIGNAL_SIZE;
-
     p_quick_image = g_pmmap_buf+len_tmp;
     memset(p_quick_image, 0, ORIGNAL_SIZE);                         //640*480*1.5+2048
     len_tmp = len_tmp+ORIGNAL_SIZE;
@@ -105,8 +101,6 @@ bool buffer_define()
 
     g_flag_camera_init = false;
     g_flag_image_init = false;
-    g_refer_image = 0xff;
-    g_refer_para = 0xff;
     memset(&discri_front, 0, sizeof(discri_front));
     return true;
 }

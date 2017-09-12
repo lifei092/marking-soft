@@ -32,7 +32,6 @@ unsigned char *p_data8;
 
 unsigned char *p_camera_buffer;		     		//相机参数缓存区----128B
 unsigned char *p_image_buffer;			    	//处理参数缓存
-unsigned char *p_refer_image;				//参考图像缓存区iw12--640*480*1.5=460800bytes + 2048 = 462848
 unsigned char *p_quick_image;				//快照图缓存区 iw12---640*480*1.5=460800bytes + 2048 = 462848
 
 unsigned char *p_param_info;					//存储参数缓存指针
@@ -44,11 +43,6 @@ unsigned char *p_send;										//tcp send buff-1mbytes--------8000
 
 unsigned char *p_echo;										//程序描述,current save the process miaoshu
 unsigned char *p_online;									//current online data
-
-uint8_t        g_refer_image;								//有新的参考图像标识,自增一，取低五位
-															//检测到此标识变化后将重新写当前参考图像文件并向前端发送参考图像；
-uint8_t		   g_refer_para;								//更新当前中心参数文件标识,自增一，取低五位
-															//检测到此标识变化后将重新写当前中心参数文件并向前端发送相机和预处理参数；
 
 uint8_t		   g_buf_num;				    //当前buffer编号  number=numer_ori & 0x1f
 uint8_t		   g_buf_cur_num;				//当前触发编号
@@ -97,7 +91,7 @@ struct ExtCamPara
 struct Discriptor2K_Label
 {
 /*raw12图像特征描述32bytes*/
-    uint16_t raw12_w;						//前端raw12的宽度，现阶段固定为1280;
+    uint16_t raw12_w;						//前端raw12的宽度，现阶段固定为640;
     uint16_t raw12_h;						//前端raw12的高度，现阶段固定为480;
     uint16_t wb_red_now;					//当前相机使用的白平衡red系数;
     uint16_t wb_blue_now;				    //当前相机使用的白平衡blue系数;
@@ -112,11 +106,11 @@ struct Discriptor2K_Label
 											//byte0[3]保留;
 											//byte0[2:0]触发器号0--7；
     uint8_t  raw12_sn;						//序号0--255，各个前端工控机buf编号使用其中的低5bit;
-    uint8_t  raw12_cam_no;					//本raw12图像源自几号相机,商标检测1~4号相机
+    uint8_t  raw12_cam_no;					//本raw12图像源自几号相机
     uint8_t  rsv0[21];
 /*rgb全尺寸图像特征描述32bytes*/
     uint16_t rgb_all_w;						//前端rgb全尺寸图像的宽度，现阶段固定为480;
-    uint16_t rgb_all_h;						//前端rgb全尺寸图像的高度，现阶段固定为1280;
+    uint16_t rgb_all_h;						//前端rgb全尺寸图像的高度，现阶段固定为640;
     uint8_t  rsv1[28];
 /* 本图像使用的相机参数128bytes*/
     uint8_t  camera_buffer[128];
@@ -241,7 +235,7 @@ struct ExtProcessPara
 struct ExtIPCParaItem
 {
     struct ExtCamPara ext_cam_para;							    //相机参数部分，128 bytes long;
-    struct ExtProcessPara ext_process_para[4];		            //商标检测前端预处理参数组,256 bytes long;
+    struct ExtProcessPara ext_process_para[4];		            //处理参数组,256 bytes long;
     uint8_t rsv[21624];
 };//98296 bytes long,8bytes alignment
 
